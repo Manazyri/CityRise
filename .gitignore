@@ -113,3 +113,4 @@ $RECYCLE.BIN/
 
 # Coplay/MCP runtime artifacts (kept out of VCS where appropriate)
 # Packages/Coplay is the MCP plugin install — keep it tracked.
+.claude/scheduled_tasks.lock

@@ -1,0 +1,25 @@
+{
+    "name": "CityRise.Debug",
+    "rootNamespace": "CityRise.Debug",
+    "references": [
+        "CityRise.Core",
+        "CityRise.Content",
+        "CityRise.Simulation",
+        "CityRise.Persistence",
+        "CityRise.Presentation",
+        "CityRise.UI",
+        "CityRise.Tools",
+        "CityRise.App",
+        "Unity.Mathematics",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

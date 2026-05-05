@@ -1,0 +1,23 @@
+{
+    "name": "CityRise.Presentation",
+    "rootNamespace": "CityRise.Presentation",
+    "references": [
+        "CityRise.Core",
+        "CityRise.Content",
+        "CityRise.Simulation",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.Cinemachine",
+        "Unity.Splines"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

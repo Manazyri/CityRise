@@ -1,0 +1,23 @@
+{
+    "name": "CityRise.Tools",
+    "rootNamespace": "CityRise.Tools",
+    "references": [
+        "CityRise.Core",
+        "CityRise.Content",
+        "CityRise.Simulation",
+        "CityRise.Presentation",
+        "CityRise.UI",
+        "Unity.Mathematics",
+        "Unity.InputSystem",
+        "Unity.Splines"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

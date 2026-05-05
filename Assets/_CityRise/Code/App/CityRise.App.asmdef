@@ -1,0 +1,27 @@
+{
+    "name": "CityRise.App",
+    "rootNamespace": "CityRise.App",
+    "references": [
+        "CityRise.Core",
+        "CityRise.Content",
+        "CityRise.Simulation",
+        "CityRise.Persistence",
+        "CityRise.Presentation",
+        "CityRise.UI",
+        "CityRise.Tools",
+        "Unity.Mathematics",
+        "Unity.Addressables",
+        "Unity.ResourceManager",
+        "Unity.Cinemachine",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

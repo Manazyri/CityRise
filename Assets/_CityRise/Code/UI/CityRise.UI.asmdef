@@ -1,0 +1,21 @@
+{
+    "name": "CityRise.UI",
+    "rootNamespace": "CityRise.UI",
+    "references": [
+        "CityRise.Core",
+        "CityRise.Content",
+        "CityRise.Simulation",
+        "CityRise.Presentation",
+        "Unity.Mathematics",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

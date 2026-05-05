@@ -1,0 +1,20 @@
+{
+    "name": "CityRise.Simulation",
+    "rootNamespace": "CityRise.Simulation",
+    "references": [
+        "CityRise.Core",
+        "CityRise.Content",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.Burst"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
