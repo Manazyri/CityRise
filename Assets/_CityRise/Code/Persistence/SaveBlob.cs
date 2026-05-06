@@ -44,42 +44,93 @@ public sealed class SaveBlob
     }
 
     // ---------- readers ----------
+    //
+    // Integer / float reads accept any compatible numeric type so backends can normalise
+    // (the JSON backend stores all integers as Int64 to preserve int64 fidelity; consumers
+    // can still ReadInt32 if the value fits).
 
-    public int ReadInt32(string key) => Read<int>(key);
-    public uint ReadUInt32(string key) => Read<uint>(key);
-    public long ReadInt64(string key) => Read<long>(key);
-    public ulong ReadUInt64(string key) => Read<ulong>(key);
-    public float ReadFloat(string key) => Read<float>(key);
-    public double ReadDouble(string key) => Read<double>(key);
-    public bool ReadBool(string key) => Read<bool>(key);
-    public string ReadString(string key) => Read<string>(key);
-    public SaveBlob ReadBlob(string key) => Read<SaveBlob>(key);
+    public int ReadInt32(string key) => checked((int)ReadIntegral(key));
+    public uint ReadUInt32(string key) => checked((uint)ReadIntegral(key));
+    public long ReadInt64(string key) => ReadIntegral(key);
+    public ulong ReadUInt64(string key) => checked((ulong)ReadIntegral(key));
+    public float ReadFloat(string key) => (float)ReadFloatingOrIntegral(key);
+    public double ReadDouble(string key) => ReadFloatingOrIntegral(key);
+    public bool ReadBool(string key) => ReadExact<bool>(key);
+    public string ReadString(string key) => ReadExact<string>(key);
+    public SaveBlob ReadBlob(string key) => ReadExact<SaveBlob>(key);
 
-    public IReadOnlyList<SaveBlob> ReadArray(string key)
-    {
-        var raw = Read<SaveBlob[]>(key);
-        return raw;
-    }
+    public IReadOnlyList<SaveBlob> ReadArray(string key) => ReadExact<SaveBlob[]>(key);
 
-    /// <summary>Try-pattern reader. Returns false if key is missing or type is wrong.</summary>
+    /// <summary>Try-pattern reader. Returns false if key is missing or value can't be widened to int.</summary>
     public bool TryReadInt32(string key, out int value)
     {
-        if (_values.TryGetValue(key, out var raw) && raw is int i)
+        if (_values.TryGetValue(key, out var raw) && TryAsInt64(raw, out var asLong)
+            && asLong >= int.MinValue && asLong <= int.MaxValue)
         {
-            value = i;
+            value = (int)asLong;
             return true;
         }
         value = 0;
         return false;
     }
 
-    private T Read<T>(string key)
+    private long ReadIntegral(string key)
     {
-        if (!_values.TryGetValue(key, out var raw))
-            throw new KeyNotFoundException($"SaveBlob missing key '{key}'.");
+        var raw = RequireValue(key);
+        if (TryAsInt64(raw, out var asLong)) return asLong;
+        throw new InvalidCastException(
+            $"SaveBlob key '{key}' is {raw?.GetType().Name ?? "null"}, expected an integer type.");
+    }
+
+    private double ReadFloatingOrIntegral(string key)
+    {
+        var raw = RequireValue(key);
+        return raw switch
+        {
+            double d => d,
+            float f => f,
+            int i => i,
+            uint u => u,
+            long l => l,
+            ulong ul => ul,
+            short s => s,
+            ushort us => us,
+            byte b => b,
+            sbyte sb => sb,
+            _ => throw new InvalidCastException(
+                $"SaveBlob key '{key}' is {raw?.GetType().Name ?? "null"}, expected a numeric type."),
+        };
+    }
+
+    private T ReadExact<T>(string key)
+    {
+        var raw = RequireValue(key);
         if (raw is T typed) return typed;
         throw new InvalidCastException(
             $"SaveBlob key '{key}' is {raw?.GetType().Name ?? "null"}, expected {typeof(T).Name}.");
+    }
+
+    private object? RequireValue(string key)
+    {
+        if (!_values.TryGetValue(key, out var raw))
+            throw new KeyNotFoundException($"SaveBlob missing key '{key}'.");
+        return raw;
+    }
+
+    private static bool TryAsInt64(object? raw, out long value)
+    {
+        switch (raw)
+        {
+            case int i: value = i; return true;
+            case uint u: value = u; return true;
+            case long l: value = l; return true;
+            case ulong ul when ul <= long.MaxValue: value = (long)ul; return true;
+            case short s: value = s; return true;
+            case ushort us: value = us; return true;
+            case byte b: value = b; return true;
+            case sbyte sb: value = sb; return true;
+            default: value = 0; return false;
+        }
     }
 
     private static string Require(string key)
