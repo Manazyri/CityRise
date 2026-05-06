@@ -6,14 +6,15 @@
         "CityRise.Content",
         "CityRise.Simulation",
         "Unity.Mathematics",
-        "Unity.Collections",
-        "Unity.Nuget.Newtonsoft.Json"
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],

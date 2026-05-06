@@ -23,6 +23,9 @@ public sealed class CommandBus
     /// <summary>Fires for each rejected command: (command, reason). UI subscribes via NotificationBus.</summary>
     public event Action<ICommand, string>? OnRejected;
 
+    /// <summary>Fires after each successful Apply, before the next command in the queue runs. ReplayRecorder subscribes.</summary>
+    public event Action<ICommand>? OnApplied;
+
     /// <summary>Number of commands waiting in the queue.</summary>
     public int PendingCount => _pending.Count;
 
@@ -54,6 +57,7 @@ public sealed class CommandBus
             {
                 PushUndo(new CommandRecord(cmd, inverse: null));
                 _redo.Clear();
+                OnApplied?.Invoke(cmd);
                 succeeded++;
             }
             else
