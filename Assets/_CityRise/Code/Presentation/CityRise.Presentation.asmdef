@@ -9,7 +9,8 @@
         "Unity.Collections",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.Cinemachine",
-        "Unity.Splines"
+        "Unity.Splines",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
