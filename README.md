@@ -1,5 +1,8 @@
 # CityRise
 
+[![Build](https://github.com/Manazyri/CityRise/actions/workflows/build.yml/badge.svg)](https://github.com/Manazyri/CityRise/actions/workflows/build.yml)
+[![Tests](https://github.com/Manazyri/CityRise/actions/workflows/test.yml/badge.svg)](https://github.com/Manazyri/CityRise/actions/workflows/test.yml)
+
 A stylized low-poly 3D city-builder for PC. Two-person team (programmer + 3D modeler), hobby project with potential commercial pivot deferred to end of Alpha.
 
 **Status:** Phase 0 — Setup, tech stack, and Phase-0 facades. See `PHASE_0_TASKS.md` for the current task list.

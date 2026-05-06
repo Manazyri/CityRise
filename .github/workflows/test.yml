@@ -10,6 +10,12 @@ concurrency:
   group: test-${{ github.ref }}
   cancel-in-progress: true
 
+# game-ci/unity-test-runner posts results as a GitHub Check; default GITHUB_TOKEN
+# can read but not write checks. Grant the minimum needed.
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   test:
     name: EditMode tests
