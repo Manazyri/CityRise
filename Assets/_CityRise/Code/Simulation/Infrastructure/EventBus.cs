@@ -50,14 +50,34 @@ public sealed class EventBus
     }
 
     /// <summary>Drain every queue, dispatching each pending event to its subscribers.</summary>
+    /// <remarks>
+    /// Snapshot the active count so handlers that re-publish during dispatch don't fire mid-flush.
+    /// After dispatch, queues that still have pending events (from re-publishes) stay registered for
+    /// the next flush; everything we drained is removed.
+    /// </remarks>
     public int Flush()
     {
         var dispatched = 0;
-        for (int i = 0; i < _queuesWithPending.Count; i++)
+        var n = _queuesWithPending.Count;
+        for (int i = 0; i < n; i++)
         {
             dispatched += _queuesWithPending[i].FlushQueue();
         }
-        _queuesWithPending.Clear();
+        // Walk the dispatched range; drop queues that emptied, retain those with re-published items.
+        var write = 0;
+        for (int read = 0; read < n; read++)
+        {
+            if (_queuesWithPending[read].PendingCount > 0)
+            {
+                _queuesWithPending[write++] = _queuesWithPending[read];
+            }
+        }
+        // Slide any newly-published queues (added during dispatch at indices >= n) down to fill the gap.
+        for (int read = n; read < _queuesWithPending.Count; read++)
+        {
+            _queuesWithPending[write++] = _queuesWithPending[read];
+        }
+        _queuesWithPending.RemoveRange(write, _queuesWithPending.Count - write);
         return dispatched;
     }
 
@@ -89,12 +109,15 @@ public sealed class EventBus
     {
         int FlushQueue();
         void Clear();
+        int PendingCount { get; }
     }
 
     private sealed class TypedQueue<T> : IEventQueue where T : struct, IEvent
     {
         public readonly List<T> Pending = new();
         public Action<T>? Handler;
+
+        public int PendingCount => Pending.Count;
 
         public int FlushQueue()
         {
