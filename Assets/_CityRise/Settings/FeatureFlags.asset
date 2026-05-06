@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 0a81064d4ffa94f238838490d7e78fa3, type: 3}
   m_Name: FeatureFlags
-  m_EditorClassIdentifier: CityRise.Core:CityRise.Core:FeatureFlags
+  m_EditorClassIdentifier:
   _replayRecorderEnabled: 0
   _integrityCheckerEnabled: 0
   _growthEnabled: 0

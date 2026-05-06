@@ -6,8 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/_CityRise/Scenes/Boot.unity
+    guid: d708919cfcc1e40c4b18f869617ed470
+  - enabled: 1
+    path: Assets/_CityRise/Scenes/Main.unity
+    guid: b7d2e09ae8d6a41c49c7120cc3c558d6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
