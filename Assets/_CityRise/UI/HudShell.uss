@@ -1,0 +1,63 @@
+/* HUD shell — Phase 1 placeholder layout. Tones tuned for stylized low-poly art direction
+   (warm but high-contrast over the world view). Real visual pass arrives in Phase 10. */
+
+.hud-root {
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+.top-bar {
+    height: 48px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 12px;
+    padding-right: 12px;
+    background-color: rgba(20, 26, 36, 0.85);
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.top-bar__title {
+    -unity-font-style: bold;
+    color: rgb(232, 226, 210);
+    font-size: 18px;
+    -unity-text-align: middle-left;
+}
+
+.top-bar__stats {
+    flex-direction: row;
+    align-items: center;
+}
+
+.middle-area {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-end;
+}
+
+.right-panel {
+    width: 320px;
+    background-color: rgba(20, 26, 36, 0.78);
+    border-left-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.06);
+}
+
+.bottom-toolbar {
+    height: 64px;
+    background-color: rgba(20, 26, 36, 0.92);
+    border-top-width: 1px;
+    border-top-color: rgba(255, 255, 255, 0.08);
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.bottom-toolbar__slots {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}

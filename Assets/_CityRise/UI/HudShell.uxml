@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/_CityRise/UI/HudShell.uss" />
+    <ui:VisualElement name="hud-root" picking-mode="Ignore" class="hud-root">
+
+        <ui:VisualElement name="top-bar" class="top-bar">
+            <ui:Label text="CityRise" class="top-bar__title" />
+            <ui:VisualElement name="top-bar__stats" class="top-bar__stats" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="middle-area" picking-mode="Ignore" class="middle-area">
+            <ui:VisualElement name="right-panel" class="right-panel" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="bottom-toolbar" class="bottom-toolbar">
+            <ui:VisualElement name="bottom-toolbar__slots" class="bottom-toolbar__slots" />
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
