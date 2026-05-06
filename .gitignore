@@ -116,4 +116,4 @@ $RECYCLE.BIN/
 .claude/scheduled_tasks.lock
 
 # Local diagnostic screenshots
-screenshot.png
+screenshot*.png
