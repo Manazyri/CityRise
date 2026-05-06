@@ -6,7 +6,8 @@
         "CityRise.Content",
         "CityRise.Simulation",
         "Unity.Mathematics",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.Nuget.Newtonsoft.Json"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
