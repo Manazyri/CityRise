@@ -117,3 +117,6 @@ $RECYCLE.BIN/
 
 # Local diagnostic screenshots
 screenshot*.png
+
+# Microsoft Word lock files (created when a docx is open in Word/Pages)
+~$*.docx
