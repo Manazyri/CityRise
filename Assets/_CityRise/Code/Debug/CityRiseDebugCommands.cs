@@ -1,8 +1,10 @@
 #nullable enable
 
 using System;
+using System.IO;
 using System.Text;
 using CityRise.App;
+using CityRise.Persistence;
 using CityRise.Presentation.Camera;
 using CityRise.Simulation.Infrastructure;
 using UnityEngine;
@@ -16,9 +18,9 @@ namespace CityRise.Debug
     /// once but commands run repeatedly during a session.
     /// </summary>
     /// <remarks>
-    /// Phase-1 starters per Tech Roadmap §6.3: <c>set_tick_rate</c>, <c>teleport_camera</c>,
-    /// <c>help</c>. <c>dump_state</c> arrives at P1.End once the SaveManifest registration is
-    /// wired; <c>run_commands_from_file</c> follows in Phase 2.
+    /// Phase-1 starters per Tech Roadmap §6.3: <c>help</c>, <c>set_tick_rate</c>,
+    /// <c>teleport_camera</c>, <c>dump_state</c>, <c>load_state</c>.
+    /// <c>run_commands_from_file</c> follows in Phase 2.
     /// </remarks>
     public static class CityRiseDebugCommands
     {
@@ -69,6 +71,46 @@ namespace CityRise.Debug
             if (rig is null) return "No RtsCameraController found in active scene.";
             rig.transform.position = new Vector3(x, y, z);
             return $"Camera rig at ({x:F2}, {y:F2}, {z:F2}).";
+        }
+
+        [DebugCommand("dump_state", "Save current state to a debug JSON file. Filename optional; defaults to debug_dump.json.")]
+        public static string DumpState(string filename = "debug_dump.json")
+        {
+            if (!TryGetSaveService(out var svc, out var error)) return error;
+            var path = ResolvePath(filename);
+            var result = svc.Save(path);
+            return result.IsOk ? $"Saved to {path}" : $"Save failed: {result.Error}";
+        }
+
+        [DebugCommand("load_state", "Load state from a debug JSON file. Filename optional; defaults to debug_dump.json.")]
+        public static string LoadState(string filename = "debug_dump.json")
+        {
+            if (!TryGetSaveService(out var svc, out var error)) return error;
+            var path = ResolvePath(filename);
+            if (!File.Exists(path)) return $"Save file not found: {path}";
+            var result = svc.Load(path);
+            return result.IsOk ? $"Loaded from {path}" : $"Load failed: {result.Error}";
+        }
+
+        private static bool TryGetSaveService(out SaveService svc, out string error)
+        {
+            svc = null!;
+            error = string.Empty;
+            var services = Bootstrap.Instance?.Services;
+            if (services is null) { error = "Bootstrap not loaded; SaveService unavailable."; return false; }
+            if (!services.TryGet<SaveService>(out var found) || found is null)
+            {
+                error = "SaveService not registered.";
+                return false;
+            }
+            svc = found;
+            return true;
+        }
+
+        private static string ResolvePath(string filename)
+        {
+            if (Path.IsPathRooted(filename)) return filename;
+            return Path.Combine(Application.persistentDataPath, filename);
         }
 
         private static bool TryParseSpeed(string token, out SpeedMultiplier multiplier)

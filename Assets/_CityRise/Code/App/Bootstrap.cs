@@ -1,6 +1,7 @@
 #nullable enable
 
 using CityRise.Core;
+using CityRise.Persistence;
 using CityRise.Simulation.Infrastructure;
 using CityRise.UI;
 using UnityEngine;
@@ -27,6 +28,7 @@ namespace CityRise.App
 
         private ServiceContainer? _services;
         private TickScheduler? _tickScheduler;
+        private SaveManifest? _saveManifest;
 
         /// <summary>Singleton-style accessor for in-scene MonoBehaviours that need ServiceContainer.</summary>
         public static Bootstrap? Instance { get; private set; }
@@ -93,6 +95,17 @@ namespace CityRise.App
             _tickScheduler = new TickScheduler();
             container.Register(_tickScheduler);
 
+            // Persistence wiring. Manifest holds the save/load order; migrations registry
+            // applies schema upgrades on load. SaveService composes both.
+            _saveManifest = new SaveManifest();
+            var migrations = new MigrationRegistry();
+            container.Register(_saveManifest);
+            container.Register(migrations);
+            container.Register(new SaveService(_saveManifest, migrations));
+
+            // Time-control state: serialize TickScheduler.Speed across save/load.
+            _saveManifest.Register(new TimeControlSaveState(_tickScheduler));
+
             return container;
         }
 
@@ -106,6 +119,17 @@ namespace CityRise.App
             if (panel != null && _tickScheduler != null)
             {
                 panel.Bind(_tickScheduler);
+            }
+
+            // Auto-register scene-resident ISaveable MonoBehaviours so save/load picks them up
+            // without per-instance boilerplate. Phase 1 has CameraSaveState; later phases extend.
+            if (_saveManifest != null)
+            {
+                var camera = FindAnyObjectByType<CameraSaveState>(FindObjectsInactive.Include);
+                if (camera != null && _saveManifest.Find(camera.SubsystemId) == null)
+                {
+                    _saveManifest.Register(camera);
+                }
             }
         }
 
