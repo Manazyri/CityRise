@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using CityRise.Core;
+using CityRise.Simulation.World;
 
 namespace CityRise.Simulation.Infrastructure;
 
@@ -15,6 +16,7 @@ namespace CityRise.Simulation.Infrastructure;
 /// </summary>
 public sealed class TickScheduler
 {
+    private readonly IWorldMutate _world;
     private readonly List<ITickStep> _simSteps = new();
     private readonly List<ITickStep> _growthSteps = new();
     private readonly List<ITickStep> _budgetSteps = new();
@@ -22,6 +24,11 @@ public sealed class TickScheduler
     private double _simAccumSeconds;
     private int _simTicksSinceGrowth;
     private int _simTicksSinceBudget;
+
+    public TickScheduler(IWorldMutate world)
+    {
+        _world = world ?? throw new ArgumentNullException(nameof(world));
+    }
 
     /// <summary>Multiplies real-time deltas to compress sim time. <see cref="SpeedMultiplier.Paused"/> halts ticks.</summary>
     public SpeedMultiplier Speed { get; set; } = SpeedMultiplier.Normal;
@@ -127,7 +134,7 @@ public sealed class TickScheduler
         for (int i = 0; i < steps.Count; i++)
         {
             var step = steps[i];
-            var result = step.Run(in context);
+            var result = step.Run(_world, in context);
             if (result.IsErr)
             {
                 OnStepError?.Invoke(step, context, result.Error);

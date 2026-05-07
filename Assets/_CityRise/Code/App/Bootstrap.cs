@@ -3,6 +3,7 @@
 using CityRise.Core;
 using CityRise.Persistence;
 using CityRise.Simulation.Infrastructure;
+using CityRise.Simulation.World;
 using CityRise.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -29,6 +30,7 @@ namespace CityRise.App
         private ServiceContainer? _services;
         private TickScheduler? _tickScheduler;
         private SaveManifest? _saveManifest;
+        private WorldState? _worldState;
 
         /// <summary>Singleton-style accessor for in-scene MonoBehaviours that need ServiceContainer.</summary>
         public static Bootstrap? Instance { get; private set; }
@@ -59,6 +61,10 @@ namespace CityRise.App
                 SceneManager.sceneLoaded -= OnSceneLoaded;
                 Instance = null;
             }
+            // Release NativeArrays before the GC sweeps the WorldState away — disposing twice
+            // is a no-op so re-entrancy is safe.
+            _worldState?.Dispose();
+            _worldState = null;
         }
 
         private void Update()
@@ -92,7 +98,19 @@ namespace CityRise.App
 
             container.Register(new NotificationBus());
 
-            _tickScheduler = new TickScheduler();
+            // World state — sized at GameConstants.DefaultMapSizeTiles. Allocator.Persistent
+            // because it lives the whole session; OnDestroy disposes the NativeArrays.
+            _worldState = WorldState.CreateDefault();
+            container.Register<IWorldRead>(_worldState);
+            container.Register<IWorldMutate>(_worldState);
+
+            // CommandBus + replay recorder. The bus is its own service; a wrapper ITickStep
+            // (registered below) drains it as the first step of each sim tick.
+            var commandBus = new CommandBus();
+            container.Register(commandBus);
+
+            _tickScheduler = new TickScheduler(_worldState);
+            _tickScheduler.RegisterSim(new CommandBusDrainStep(commandBus));
             container.Register(_tickScheduler);
 
             // Persistence wiring. Manifest holds the save/load order; migrations registry

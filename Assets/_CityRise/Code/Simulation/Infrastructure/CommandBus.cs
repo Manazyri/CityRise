@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using CityRise.Core;
+using CityRise.Simulation.World;
 
 namespace CityRise.Simulation.Infrastructure;
 
@@ -44,15 +45,16 @@ public sealed class CommandBus
 
     /// <summary>
     /// Apply every pending command in submission order. Returns the number that succeeded.
-    /// Designed to run as the first step of each sim tick.
+    /// Designed to run as the first step of each sim tick — the scheduler hands its
+    /// <see cref="IWorldMutate"/> down so commands can mutate state.
     /// </summary>
-    public int DrainQueue()
+    public int DrainQueue(IWorldMutate world)
     {
         var succeeded = 0;
         while (_pending.Count > 0)
         {
             var cmd = _pending.Dequeue();
-            var result = cmd.Apply();
+            var result = cmd.Apply(world);
             if (result.IsOk)
             {
                 PushUndo(new CommandRecord(cmd, inverse: null));
@@ -69,7 +71,7 @@ public sealed class CommandBus
     }
 
     /// <summary>Pop the most recent undoable command and apply its inverse. Returns Err if nothing reversible is available.</summary>
-    public Result<Unit> Undo()
+    public Result<Unit> Undo(IWorldMutate world)
     {
         while (_undo.Count > 0)
         {
@@ -77,7 +79,7 @@ public sealed class CommandBus
             _undo.RemoveLast();
             if (last.Inverse is null) continue;
 
-            var result = last.Inverse.Apply();
+            var result = last.Inverse.Apply(world);
             if (result.IsErr) return result;
 
             _redo.AddLast(last);
@@ -87,12 +89,12 @@ public sealed class CommandBus
     }
 
     /// <summary>Pop the most recent undone command and re-apply it.</summary>
-    public Result<Unit> Redo()
+    public Result<Unit> Redo(IWorldMutate world)
     {
         if (_redo.Count == 0) return Result<Unit>.Err("Nothing to redo.");
         var record = _redo.Last!.Value;
         _redo.RemoveLast();
-        var result = record.Command.Apply();
+        var result = record.Command.Apply(world);
         if (result.IsErr) return result;
         PushUndo(record);
         return Result<Unit>.Ok(Unit.Value);

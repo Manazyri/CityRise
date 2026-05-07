@@ -3,7 +3,9 @@
 using System.IO;
 using CityRise.Persistence;
 using CityRise.Simulation.Infrastructure;
+using CityRise.Simulation.World;
 using NUnit.Framework;
+using Unity.Collections;
 
 namespace CityRise.Tests.EditMode;
 
@@ -41,12 +43,13 @@ public sealed class Phase1RoundTripTests
     public void Save_Then_Load_RoundTrips_TickSpeed_AndCameraState()
     {
         var path = Path.Combine(Path.GetTempPath(), $"cityrise-p1end-{System.Guid.NewGuid():N}.json");
+        using var world = new WorldState(1, Allocator.Temp);
         try
         {
             var manifest = new SaveManifest();
             var migrations = new MigrationRegistry();
 
-            var scheduler = new TickScheduler { Speed = SpeedMultiplier.Fast };
+            var scheduler = new TickScheduler(world) { Speed = SpeedMultiplier.Fast };
             var timeState = new TimeControlSaveState(scheduler);
             var camera = new StubCameraSaveState
             {
@@ -86,9 +89,10 @@ public sealed class Phase1RoundTripTests
     [Test]
     public void TimeControlSaveState_RoundTripsAllFourSpeeds()
     {
+        using var world = new WorldState(1, Allocator.Temp);
         foreach (var speed in new[] { SpeedMultiplier.Paused, SpeedMultiplier.Normal, SpeedMultiplier.Fast, SpeedMultiplier.Faster })
         {
-            var scheduler = new TickScheduler { Speed = speed };
+            var scheduler = new TickScheduler(world) { Speed = speed };
             var state = new TimeControlSaveState(scheduler);
             var blob = state.Serialize();
 

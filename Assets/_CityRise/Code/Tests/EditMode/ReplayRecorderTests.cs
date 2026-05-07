@@ -4,8 +4,10 @@ using System.IO;
 using CityRise.Core;
 using CityRise.Persistence;
 using CityRise.Simulation.Infrastructure;
+using CityRise.Simulation.World;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Unity.Collections;
 
 namespace CityRise.Tests.EditMode;
 
@@ -15,14 +17,16 @@ public sealed class ReplayRecorderTests
     {
         public string Name { get; }
         public NamedCommand(string name) { Name = name; }
-        public Result<Unit> Apply() => Result<Unit>.Ok(Unit.Value);
+        public Result<Unit> Apply(IWorldMutate world) => Result<Unit>.Ok(Unit.Value);
     }
 
     private sealed class FailingCommand : ICommand
     {
         public string Name => "Fail";
-        public Result<Unit> Apply() => Result<Unit>.Err("nope");
+        public Result<Unit> Apply(IWorldMutate world) => Result<Unit>.Err("nope");
     }
+
+    private static WorldState NewWorld() => new(1, Allocator.Temp);
 
     [Test]
     public void Constructor_RejectsNonPositiveCapacity()
@@ -97,6 +101,7 @@ public sealed class ReplayRecorderTests
     [Test]
     public void Bind_RecordsSuccessfulCommands_SkipsRejected()
     {
+        using var world = NewWorld();
         var bus = new CommandBus();
         ulong tick = 5;
         var r = new ReplayRecorder(0u, simTickProvider: () => tick);
@@ -105,7 +110,7 @@ public sealed class ReplayRecorderTests
         bus.Submit(new NamedCommand("X"));
         bus.Submit(new FailingCommand());
         bus.Submit(new NamedCommand("Y"));
-        bus.DrainQueue();
+        bus.DrainQueue(world);
 
         var snap = r.Snapshot();
         Assert.That(snap.Count, Is.EqualTo(2));
@@ -117,17 +122,18 @@ public sealed class ReplayRecorderTests
     [Test]
     public void Unbind_StopsRecording()
     {
+        using var world = NewWorld();
         var bus = new CommandBus();
         var r = new ReplayRecorder(0u);
         r.Bind(bus);
 
         bus.Submit(new NamedCommand("A"));
-        bus.DrainQueue();
+        bus.DrainQueue(world);
         Assert.That(r.Count, Is.EqualTo(1));
 
         r.Unbind(bus);
         bus.Submit(new NamedCommand("B"));
-        bus.DrainQueue();
+        bus.DrainQueue(world);
         Assert.That(r.Count, Is.EqualTo(1), "Unbound recorder must not capture further commands.");
     }
 
