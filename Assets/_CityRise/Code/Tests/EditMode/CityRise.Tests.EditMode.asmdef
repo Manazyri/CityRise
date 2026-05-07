@@ -6,6 +6,7 @@
         "CityRise.Content",
         "CityRise.Simulation",
         "CityRise.Persistence",
+        "CityRise.Debug",
         "Unity.Mathematics",
         "Unity.Collections",
         "UnityEngine.TestRunner",

@@ -11,7 +11,8 @@
         "CityRise.Tools",
         "CityRise.App",
         "Unity.Mathematics",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

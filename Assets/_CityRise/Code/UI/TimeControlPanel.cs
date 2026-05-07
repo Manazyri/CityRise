@@ -63,6 +63,11 @@ namespace CityRise.UI
             var keyboard = Keyboard.current;
             if (keyboard == null) return;
 
+            // Yield hotkeys to whichever overlay is currently capturing input (the debug
+            // console, modal dialogs in later phases). Layered via Core/InputContext so the
+            // UI layer doesn't need to know about Debug specifically.
+            if (CityRise.Core.InputContext.SuppressGameplayHotkeys) return;
+
             if (keyboard.spaceKey.wasPressedThisFrame)
             {
                 TogglePause();
